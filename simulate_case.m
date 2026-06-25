@@ -1,0 +1,82 @@
+function result = simulate_case(D,p)
+exponents = structured_exponents(D);
+q = size(exponents,1);
+K = p.simulation.K;
+
+k = 0:K;
+time = k*p.plant.Ts;
+x = zeros(1,K+1);
+u = zeros(1,K+1);
+r = reference_signal(k,p);
+
+x(1) = p.plant.x0;
+u(1) = initialization_input(0,p);
+
+theta = zeros(q,1);
+P = p.rls.P0Scale*eye(q);
+thetaHistory = zeros(q,K+1);
+thetaHistory(:,1) = theta;
+
+predictionError = NaN(1,K+1);
+predictedState = NaN(1,K+1);
+Ahat = NaN(1,K+1);
+Bhat = NaN(1,K+1);
+chat = NaN(1,K+1);
+Afe = NaN(1,K+1);
+Bfe = NaN(1,K+1);
+qpExitflag = NaN(1,K+1);
+qpObjective = NaN(1,K+1);
+qpMaxSlack = NaN(1,K+1);
+
+for currentK = 0:K-1
+    idx = currentK + 1;
+
+    [Ahat(idx),Bhat(idx),chat(idx)] = ...
+        frozen_surrogate(theta,exponents,x(idx),u(idx));
+    [Afe(idx),Bfe(idx)] = analytical_fe_jacobian(x(idx),u(idx),p);
+
+    % At instant k, compute u_{k+1}; the plant still advances with u_k.
+    if currentK < p.id.Nid
+        u(idx+1) = initialization_input(currentK+1,p);
+    else
+        rHorizon = mpc_reference_horizon(currentK,p);
+        [u(idx+1),qp] = solve_mpc_qp( ...
+            x(idx),u(idx),Ahat(idx),Bhat(idx),chat(idx),rHorizon,p);
+        qpExitflag(idx) = qp.exitflag;
+        qpObjective(idx) = qp.objective;
+        qpMaxSlack(idx) = qp.maxSlack;
+    end
+
+    x(idx+1) = plant_step(x(idx),u(idx),p);
+    phi = taylor_features(x(idx),u(idx),exponents);
+    [theta,P,predictionError(idx),predictedState(idx)] = ...
+        rls_update(theta,P,phi,x(idx+1),p.rls.lambda);
+    thetaHistory(:,idx+1) = theta;
+end
+
+[Ahat(end),Bhat(end),chat(end)] = ...
+    frozen_surrogate(theta,exponents,x(end),u(end));
+[Afe(end),Bfe(end)] = analytical_fe_jacobian(x(end),u(end),p);
+
+result.D = D;
+result.q = q;
+result.exponents = exponents;
+result.k = k;
+result.time = time;
+result.x = x;
+result.u = u;
+result.reference = r;
+result.thetaHistory = thetaHistory;
+result.predictionError = predictionError;
+result.predictedState = predictedState;
+result.Ahat = Ahat;
+result.Bhat = Bhat;
+result.chat = chat;
+result.Afe = Afe;
+result.Bfe = Bfe;
+result.qpExitflag = qpExitflag;
+result.qpObjective = qpObjective;
+result.qpMaxSlack = qpMaxSlack;
+
+[result.metrics,result.segmentMetrics] = compute_metrics(result,p);
+end
