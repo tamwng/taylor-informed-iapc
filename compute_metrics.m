@@ -1,4 +1,5 @@
 function [summary,segments] = compute_metrics(result,p)
+
 k = result.k;
 e = result.x - result.reference;
 controlMask = k >= p.id.Nid;
@@ -7,20 +8,30 @@ rmse = sqrt(mean(e(controlMask).^2));
 mae = mean(abs(e(controlMask)));
 maxAbsError = max(abs(e(controlMask)));
 
-segmentStart = p.id.Nid + (0:numel(p.reference.commands)-1)*p.reference.Kr;
-segmentStop = segmentStart + p.reference.Kr;
+segmentRows = cell(numel(get_reference_levels(p)),1);
 ssErrors = zeros(0,1);
-segmentRows = cell(numel(segmentStart),1);
+
+levels = get_reference_levels(p);
+segmentStart = p.id.Nid + (0:numel(levels)-1)*p.reference.Kr;
+segmentStop = segmentStart + p.reference.Kr;
 
 for j = 1:numel(segmentStart)
     mask = k >= segmentStart(j) & k < segmentStop(j);
+
     segmentError = e(mask);
     segmentInput = result.u(mask);
+    segmentState = result.x(mask);
 
-    ssStart = max(segmentStart(j),segmentStop(j)-p.metrics.ssWindow);
-    ssMask = k >= ssStart & k < segmentStop(j);
-    currentSSError = e(ssMask);
-    ssErrors = [ssErrors; currentSSError(:)]; %#ok<AGROW>
+    if isfield(p.reference,'type') && strcmpi(p.reference.type,'amp_sine')
+        skip = round(1/(p.reference.frequencyHz*p.plant.Ts));
+        evalStart = min(segmentStart(j) + skip, segmentStop(j)-1);
+    else
+        evalStart = max(segmentStart(j),segmentStop(j)-p.metrics.ssWindow);
+    end
+
+    evalMask = k >= evalStart & k < segmentStop(j);
+    evalError = e(evalMask);
+    ssErrors = [ssErrors; evalError(:)]; %#ok<AGROW>
 
     if numel(segmentInput) > 1
         segmentTV = sum(abs(diff(segmentInput)));
@@ -28,13 +39,24 @@ for j = 1:numel(segmentStart)
         segmentTV = 0;
     end
 
+    satRatioU = mean(abs(segmentInput) > 0.98*p.constraints.uMax);
+    satRatioX = mean(abs(segmentState) > 0.98*p.constraints.xMax);
+
     segmentRows{j} = table( ...
-        result.D,p.reference.commands(j), ...
+        result.D,levels(j), ...
         sqrt(mean(segmentError.^2)), ...
-        mean(currentSSError),mean(abs(currentSSError)),segmentTV, ...
-        'VariableNames',{'Degree','Command','RMSE', ...
-        'SteadyStateBias','SteadyStateAbsError','InputVariation'});
+        mean(abs(segmentError)), ...
+        max(abs(segmentError)), ...
+        mean(evalError), ...
+        mean(abs(evalError)), ...
+        segmentTV, ...
+        satRatioU, ...
+        satRatioX, ...
+        'VariableNames',{'Degree','ReferenceLevel','RMSE', ...
+        'MAE','MaxAbsError','BiasEval','AbsErrorEval', ...
+        'InputVariation','InputSaturationRatio','StateSaturationRatio'});
 end
+
 segments = vertcat(segmentRows{:});
 
 controlInput = result.u(controlMask);
@@ -63,7 +85,18 @@ summary = table( ...
     mean(ssErrors),mean(abs(ssErrors)),totalVariation, ...
     maxStateViolation,maxInputViolation,maxPredictedSlack,qpFailures, ...
     'VariableNames',{'Degree','Coefficients','RMSE','MAE', ...
-    'MaxAbsError','SteadyStateBias','SteadyStateAbsError', ...
+    'MaxAbsError','BiasEval','AbsErrorEval', ...
     'TotalInputVariation','MaxStateViolation','MaxInputViolation', ...
     'MaxPredictedSlack','QPFailures'});
+end
+
+
+function levels = get_reference_levels(p)
+
+if isfield(p.reference,'type') && strcmpi(p.reference.type,'amp_sine')
+    levels = p.reference.ampLevels(:);
+else
+    levels = p.reference.commands(:);
+end
+
 end

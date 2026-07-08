@@ -1,18 +1,6 @@
 function plot_results(results,p)
 
-set(groot,...
-    'defaultAxesTickLabelInterpreter','latex',...
-    'defaultTextInterpreter','latex',...
-    'defaultLegendInterpreter','latex',...
-    'defaultAxesFontSize',14,...
-    'defaultTextFontSize',14,...
-    'defaultLegendFontSize',13,...
-    'defaultAxesLabelFontSizeMultiplier',1.2,...
-    'defaultAxesTitleFontSizeMultiplier',1.0,...
-    'defaultAxesLineWidth',1.0,...
-    'defaultLineLineWidth',1.5);
-
-labels = cellfun(@(s) sprintf('$D = %d$',s.D),results, ...
+labels = cellfun(@(s) sprintf('D = %d',s.D),results, ...
     'UniformOutput',false);
 activationTime = p.id.Nid*p.plant.Ts;
 
@@ -58,17 +46,17 @@ for d = mainDegrees
     plot(results{idx}.time,results{idx}.x,...
         'LineStyle','-',...
         'LineWidth',width,...
-        'DisplayName',sprintf('$D = %d$',d));
+        'DisplayName',sprintf('D = %d',d));
 end
 
 yline(p.constraints.xMax,':','HandleVisibility','off');
 yline(-p.constraints.xMax,':','HandleVisibility','off');
 xline(activationTime,':','MPC on','HandleVisibility','off');
 
-xlabel('$t$ (s)', 'Interpreter', 'latex');
+xlabel('$t$ (s)');
 ylabel('$x$', 'Interpreter', 'latex');
 grid on;
-legend('Location','northeast');
+legend('Location','best');
 
 if p.output.save
     saveas(gcf,fullfile(p.output.folder,'state_tracking_D1_D5.png'));
@@ -136,10 +124,12 @@ end
 
 xline(activationTime,':','MPC on','HandleVisibility','off');
 
-xlabel('$t$ (s)', 'Interpreter', 'latex');
-ylabel('$|r-x|$', 'Interpreter', 'latex');
+xlabel('$t$ (s)');
+ylabel('$x$', 'Interpreter', 'latex');
+xlabel('Time (s)');
+ylabel('|r-x|');
 grid on;
-legend('Location','northeast');
+legend('Location','southeast');
 
 if p.output.save
     saveas(gcf,fullfile(p.output.folder,'tracking_error_log.png'));
@@ -178,34 +168,34 @@ end
 figure('Name','Per-amplitude evaluated error','Color','w');
 bar(ampLevels,errorTable);
 
-xlabel('Sine amplitude', 'Interpreter', 'latex');
-ylabel('Evaluated mean absolute error', 'Interpreter', 'latex');
+xlabel('Sine amplitude');
+ylabel('Evaluated mean absolute error');
 grid on;
-legend(arrayfun(@(d) sprintf('$D = %d$',d),degrees, ...
+legend(arrayfun(@(d) sprintf('D = %d',d),degrees, ...
     'UniformOutput',false),'Location','best');
 
 if p.output.save
     saveas(gcf,fullfile(p.output.folder,'per_amplitude_abs_error.png'));
 end
 
-% idx1 = find(degrees == 1,1);
-% idx5 = find(degrees == 5,1);
-% 
-% if ~isempty(idx1) && ~isempty(idx5)
-%     improvement = errorTable(:,idx1)./errorTable(:,idx5);
-% 
-%     figure('Name','D1 over D5 error ratio','Color','w');
-%     bar(ampLevels,improvement);
-% 
-%     yline(1,':','HandleVisibility','off');
-%     xlabel('Sine amplitude', 'Interpreter', 'latex');
-%     ylabel('$|e|_{D=1} / |e|_{D=5}$', 'Interpreter', 'latex');
-%     grid on;
-% 
-%     if p.output.save
-%         saveas(gcf,fullfile(p.output.folder,'D1_over_D5_error_ratio.png'));
-%     end
-% end
+idx1 = find(degrees == 1,1);
+idx5 = find(degrees == 5,1);
+
+if ~isempty(idx1) && ~isempty(idx5)
+    improvement = errorTable(:,idx1)./errorTable(:,idx5);
+
+    figure('Name','D1 over D5 error ratio','Color','w');
+    bar(ampLevels,improvement);
+
+    yline(1,':','HandleVisibility','off');
+    xlabel('Sine amplitude');
+    ylabel('|e|_{D=1} / |e|_{D=5}');
+    grid on;
+
+    if p.output.save
+        saveas(gcf,fullfile(p.output.folder,'D1_over_D5_error_ratio.png'));
+    end
+end
 
 end
 
