@@ -1,36 +1,113 @@
-# Taylor-informed adaptive predictive control: MATLAB implementation
+# Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates
 
-Run `main.m`.
+MATLAB code for the numerical study in:
+
+> **Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates**  
+> Tam W. Nguyen, 2026.  
+> Paper/arXiv: `[URL or arXiv identifier]`
+
+The code simulates the scalar nonlinear plant, identifies structured Taylor coefficients online using RLS, constructs Jacobian-frozen LPV--ARX surrogates, solves the MPC problem, and compares Taylor degrees.
+
+## Quick start
+
+Run
+
+```matlab
+main
+```
+from the repository root.
+
+Outputs are written to `results/` when `p.output.save = true` in `parameters.m`.
 
 ## Requirements
 
 - MATLAB
 - Optimization Toolbox (`quadprog`)
 
-## Paper-to-code map
+Tested MATLAB version: `2025b`.
 
-- `plant_dynamics.m`: continuous-time plant in equation (50).
-- `plant_step.m`: RK4 with zero-order-hold input from Table II; forward Euler from equation (52) is available by changing `p.plant.integrator`.
-- `structured_exponents.m` and `taylor_features.m`: structured regressors in equation (57), giving 2, 5, 9, and 14 coefficients for `D = 1, 3, 5, 7`.
-- `rls_update.m`: equations (21)-(23), specialized to the scalar case.
-- `frozen_surrogate.m`: equations (59)-(62).
-- `solve_mpc_qp.m`: equation (48), using the explicit decision vector `[x_1,...,x_N,u_1,...,u_{N-1},epsilon_1,...,epsilon_N]`.
-- `reference_signal.m`: equation (68).
-- `parameters.m`: Table II.
+## Repository layout
 
-The timing follows the paper's PCAC convention: at instant `k`, `x_k` and the currently applied `u_k` are known, and the QP computes `u_{k+1}`. The transition under `u_k` then updates RLS for the next control instant.
+The repository uses a flat structure for simplicity.
 
-## Explicit choices where the paper does not give a unique value
+```text
+.
+├── main.m                         # Runs all Taylor-degree cases and exports results
+├── parameters.m                   # Plant, RLS, MPC, reference, plotting, and output settings
+├── plant_dynamics.m               # Continuous-time nonlinear plant
+├── plant_step.m                   # Euler/RK4 sampled plant propagation
+├── structured_exponents.m         # Structured Taylor monomial exponents
+├── taylor_features.m              # Taylor-feature evaluation
+├── rls_update.m                   # Recursive least-squares update
+├── frozen_surrogate.m             # Jacobian-frozen LPV--ARX surrogate construction
+├── analytical_fe_jacobian.m       # Analytical forward-Euler Jacobian reference
+├── initialization_input.m         # Multilevel initialization input
+├── reference_signal.m             # Step, sine, amplitude-swept sine, or multisine reference
+├── mpc_reference_horizon.m        # Reference preview over the MPC horizon
+├── solve_mpc_qp.m                 # MPC quadratic program
+├── simulate_case.m                # Closed-loop simulation for one Taylor degree
+├── compute_metrics.m              # Summary and per-segment metrics
+├── plot_results.m                 # State, input, tracking-error, and bar plots
+├── results/                       # Generated figures and tables; not required as input
+├── README.md
+├── LICENSE
+└── CITATION.cff
+```
 
-1. The initialization values are cycled in the deterministic order `[0, 0.1, -0.1, 0.2, -0.2]`. Table II specifies the set of levels but not their order. Change `p.id.levels` to use another fixed cycle.
-2. The QP uses the natural preview convention `r_{i|k} = r_{k+i}`. Set `p.reference.preview = false` to hold the current command over the horizon.
-3. The run includes one dwell of `K_r` samples at the final zero command. Equation (68) defines the final command but does not state a stopping time.
+## Typical workflow
 
-## Outputs
+1. Edit `parameters.m`.
+2. Choose Taylor degrees with:
 
-`main.m` prints and saves:
+```matlab
+p.model.degrees = [1 3 5 7];
+```
 
-- aggregate RMSE, MAE, steady-state bias, steady-state absolute error, total input variation, constraint violations, predicted slack, and QP failures;
-- per-command metrics;
-- state, input, logarithmic tracking-error, and Jacobian-comparison plots;
-- `simulation_results.mat`, `summary_metrics.csv`, and `segment_metrics.csv` in `results/`.
+3. Choose the reference campaign, for example:
+
+```matlab
+p.reference.type = 'amp_sine';
+p.reference.ampLevels = [0.25 0.55 0.80 0.90 0.00];
+p.reference.preview = true;
+```
+
+4. Run:
+
+```matlab
+main
+```
+
+5. Inspect the generated figures and tables in `results/`.
+
+## Citation
+
+If you use this repository, cite both the paper and the software release.
+
+### Paper
+
+```bibtex
+@article{nguyen2026taylorinformedadaptivepredictivecontrol,
+  author  = {Nguyen, Tam W.},
+  title   = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates},
+  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/XXXX.XXXXX}
+}
+```
+
+### Software
+
+```bibtex
+@software{nguyen2026taylorinformedmpccode,
+  author    = {Nguyen, Tam W.},
+  title     = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates: MATLAB Code},
+  year      = {2026},
+  version   = {v1.0.0},
+  publisher = {GitHub},
+  url       = {https://github.com/tamwng/taylor-informed-iapc}
+}
+```
+
+## License
+
+This project is released under the BSD 3-Clause License. See `LICENSE`.
