@@ -85,6 +85,13 @@ If you use this repository, cite both the paper and the software release.
 
 ### Paper
 
+The manuscript accompanying this repository is available in:
+```
+paper/Taylor_Informed_Adaptive_Predictive_Control_v1.pdf
+```
+
+The latest version is also available on arXiv:
+
 ```bibtex
 @article{nguyen2026taylorinformedadaptivepredictivecontrol,
   author  = {Nguyen, Tam W.},
