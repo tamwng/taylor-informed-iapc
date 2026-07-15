@@ -1,12 +1,12 @@
-# Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates
+# Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV Surrogates
 
 MATLAB code for the numerical study in:
 
-> **Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates**  
+> **Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV Surrogates**  
 > Tam W. Nguyen, 2026.  
 > Paper/arXiv: `[URL or arXiv identifier]`
 
-The code simulates the scalar nonlinear plant, identifies structured Taylor coefficients online using RLS, constructs Jacobian-frozen LPV--ARX surrogates, solves the MPC problem, and compares Taylor degrees.
+The code simulates the scalar nonlinear plant, identifies structured Taylor coefficients online using RLS, constructs Jacobian-frozen LPV surrogates, solves the MPC problem, and compares Taylor degrees.
 
 ## Quick start
 
@@ -39,7 +39,7 @@ The repository uses a flat structure for simplicity.
 ├── structured_exponents.m         # Structured Taylor monomial exponents
 ├── taylor_features.m              # Taylor-feature evaluation
 ├── rls_update.m                   # Recursive least-squares update
-├── frozen_surrogate.m             # Jacobian-frozen LPV--ARX surrogate construction
+├── frozen_surrogate.m             # Jacobian-frozen LPV surrogate construction
 ├── analytical_fe_jacobian.m       # Analytical forward-Euler Jacobian reference
 ├── initialization_input.m         # Multilevel initialization input
 ├── reference_signal.m             # Step, sine, amplitude-swept sine, or multisine reference
@@ -95,7 +95,7 @@ The latest version is also available on arXiv:
 ```bibtex
 @article{nguyen2026taylorinformedadaptivepredictivecontrol,
   author  = {Nguyen, Tam W.},
-  title   = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates},
+  title   = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV Surrogates},
   journal = {arXiv preprint arXiv:XXXX.XXXXX},
   year    = {2026},
   url     = {https://arxiv.org/abs/XXXX.XXXXX}
@@ -107,7 +107,7 @@ The latest version is also available on arXiv:
 ```bibtex
 @software{nguyen2026taylorinformedmpccode,
   author    = {Nguyen, Tam W.},
-  title     = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates: MATLAB Code},
+  title     = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV Surrogates: MATLAB Code},
   year      = {2026},
   version   = {v1.0.0},
   publisher = {GitHub},
