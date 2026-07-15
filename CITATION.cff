@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite both the paper and the software release."
-title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates: MATLAB Code"
+title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV Surrogates: MATLAB Code"
 type: software
 authors:
   - family-names: "Nguyen"
@@ -13,7 +13,7 @@ url: "https://github.com/tamwng/taylor-informed-iapc"
 abstract: >-
   MATLAB implementation of Taylor-informed indirect adaptive predictive
   control using recursive least squares, structured Taylor dictionaries,
-  Jacobian-frozen LPV--ARX surrogates, and model predictive control.
+  Jacobian-frozen LPV surrogates, and model predictive control.
 keywords:
   - adaptive control
   - predictive control
