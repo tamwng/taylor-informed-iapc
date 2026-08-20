@@ -2,6 +2,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite both the accompanying manuscript and the software."
 title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors: MATLAB Code"
 type: software
+version: "1.0.0"
+date-released: "2026-08-20"
 authors:
   - family-names: "Nguyen"
     given-names: "Tam W."

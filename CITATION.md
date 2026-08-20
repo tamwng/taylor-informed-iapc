@@ -20,9 +20,10 @@ Please cite both the accompanying manuscript and the software when this reposito
   author    = {Nguyen, Tam W.},
   title     = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors: MATLAB Code},
   year      = {2026},
+  version   = {1.0.0},
   publisher = {GitHub},
-  url       = {https://github.com/tamwng/taylor-informed-iapc}
+  url       = {https://github.com/tamwng/taylor-informed-iapc/releases/tag/v1.0.0}
 }
 ```
 
-No DOI, arXiv identifier, or immutable software release has been assigned. Record the Git commit used for reproduction until a release tag is created.
+Release `v1.0.0` is the immutable software release at commit `895e99be7794a5084bbf02c9ed7c9fd8d82a9711`. No manuscript DOI or arXiv identifier has been assigned. Record the release and exact Git commit used for reproduction.

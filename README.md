@@ -120,7 +120,7 @@ results/                       Committed generated artifacts
 
 If this repository contributes to published or derived work, cite both the accompanying manuscript and the software. Verified citation text is provided in `CITATION.md` and `CITATION.cff`.
 
-The current repository state is not yet tied to an immutable software release. Until a release tag is created, record the exact Git commit used for reproduction.
+The immutable software release `v1.0.0` is tied to commit `895e99be7794a5084bbf02c9ed7c9fd8d82a9711`. Later commits on `main` may contain metadata-only updates; for reproducibility, cite the release and record the exact Git commit used.
 
 ## License
 

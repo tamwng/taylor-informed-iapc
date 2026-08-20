@@ -4,8 +4,9 @@
   "title": "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors",
   "source_state": {
     "base_commit": "6dbaa2b66c7a1f85877f4432b3710ff79c3db5b4",
-    "release_commit": null,
-    "status": "Finalized repository state; bind this manifest to an immutable release commit when a release is authorized."
+    "release_tag": "v1.0.0",
+    "release_commit": "895e99be7794a5084bbf02c9ed7c9fd8d82a9711",
+    "status": "Canonical artifacts correspond to immutable release v1.0.0; subsequent metadata-only commits do not alter the experiment."
   },
   "environment": {
     "baseline_matlab_release": "R2025b",
