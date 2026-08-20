@@ -38,8 +38,16 @@ p.simulation.K = p.id.Nid + numel(p.reference.ampLevels)*p.reference.Kr;
 
 p.metrics.ssWindow = 25;
 p.plot.jacobianDegree = 5;
+p.plot.errorDegrees = [1 5];
+p.plot.showControlInput = false;
+p.plot.showJacobianComparison = false;
+p.plot.figurePosition = [100 100 1200 720];
+p.plot.resolution = 300;
+p.plot.renderer = 'painters';
 
 p.output.makePlots = true;
 p.output.save = true;
 p.output.folder = fullfile(root,'results');
+p.output.figureVisible = 'off';
+p.output.verbose = true;
 end

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "generated_at_utc": "2026-08-20T08:56:50Z",
+  "title": "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors",
+  "source_state": {
+    "base_commit": "6dbaa2b66c7a1f85877f4432b3710ff79c3db5b4",
+    "release_commit": null,
+    "status": "Finalized repository state; bind this manifest to an immutable release commit when a release is authorized."
+  },
+  "environment": {
+    "baseline_matlab_release": "R2025b",
+    "verified_matlab_release": "R2026a Update 4",
+    "measured_runtime_seconds": 19.4,
+    "required_toolboxes": [
+      "Optimization Toolbox"
+    ],
+    "randomness": "none"
+  },
+  "experiment": {
+    "plant_a": 0.5,
+    "plant_b": 1.5,
+    "sampling_period_seconds": 0.05,
+    "integrator": "rk4",
+    "rk4_substeps": 1,
+    "initial_state": 0,
+    "state_bound": 0.75,
+    "state_constraint": "soft",
+    "input_bound": 1,
+    "input_constraint": "hard",
+    "degrees": [1, 3, 5, 7],
+    "coefficient_counts": [2, 5, 9, 14],
+    "dictionary": "forward-Euler/Taylor-structure-informed reduced model class fitted to RK4 transitions",
+    "prediction_horizon": 8,
+    "state_weights": [1, 1, 1, 1, 1, 1, 1, 10],
+    "input_increment_weight": 0.05,
+    "state_slack_weight": 100000,
+    "rls_forgetting_factor": 1,
+    "rls_initial_covariance_scale": 100000,
+    "initialization_samples": 60,
+    "initialization_levels": [0, 0.15, -0.15, 0.30, -0.30, 0.45, -0.45, 0.60, -0.60],
+    "reference_type": "amplitude-swept sine",
+    "reference_frequency_hz": 0.10,
+    "reference_amplitudes": [0.25, 0.55, 0.80, 0.90, 0],
+    "segment_samples": 300,
+    "evaluation_skip_samples": 200,
+    "final_sampling_index": 1560
+  },
+  "metric_definitions": {
+    "overall_error": "RMSE, MAE, and maximum absolute error for stored samples k >= Nid, including k = K.",
+    "segment_error": "RMSE and MAE on each half-open interval [segmentStart, segmentStop).",
+    "evaluated_error": "For each sine-amplitude segment, discard the first 200 samples and evaluate the final 100 samples.",
+    "total_input_variation": "sum(abs(diff(u))) for stored samples k >= Nid.",
+    "constraint_violation": "Maximum bound excess across all stored samples, including initialization.",
+    "predicted_slack": "Largest optimized soft-state-constraint slack across successful QPs.",
+    "qp_failures": "Nonpositive or missing solver exit flags for control instants Nid through K-1."
+  },
+  "expected_results": {
+    "absolute_tolerance": 1e-10,
+    "total_qp_failures": 0,
+    "total_input_violations": 0,
+    "summary": [
+      {"degree": 1, "coefficients": 2, "rmse": 0.0319949750481362, "mae": 0.0141755192042123, "max_state_violation": 0.00737301817701441, "total_input_variation": 12.4053662350459},
+      {"degree": 3, "coefficients": 5, "rmse": 0.0309216326205575, "mae": 0.00971360806472379, "max_state_violation": 0.000350170063833755, "total_input_variation": 11.7491268959569},
+      {"degree": 5, "coefficients": 9, "rmse": 0.0309001826057015, "mae": 0.00957612476360428, "max_state_violation": 0.000256233265769401, "total_input_variation": 11.8642537080407},
+      {"degree": 7, "coefficients": 14, "rmse": 0.0308912703084886, "mae": 0.0095886519105265, "max_state_violation": 0.000352157308952994, "total_input_variation": 11.8111461893767}
+    ]
+  },
+  "artifacts": [
+    {"file": "results/summary_metrics.csv", "role": "canonical summary metrics", "bytes": 804, "sha256": "7a4306d8df6b7fc1afbe5a309bdf9c06efc7976a66e587834397ebb920b9f0e2"},
+    {"file": "results/segment_metrics.csv", "role": "canonical per-amplitude metrics", "bytes": 2722, "sha256": "e3e51e181949460fbfcc6b6aae3822c2b3a36385cd2090efa943576ef63dc69d"},
+    {"file": "results/simulation_results.mat", "role": "complete MATLAB results", "bytes": 754301, "sha256": "b5cd0a0d61d53bf1318b8c16f4f6a2251fc06ebe322332e581a25292d7307a57"},
+    {"file": "results/state_tracking_D1_D5.png", "role": "state-tracking figure", "bytes": 237178, "sha256": "bf886142bfb075aed3859c66939cf73b43cc0524dd185ca0a62c91ee9a7a8538"},
+    {"file": "results/tracking_error_log.png", "role": "logarithmic tracking-error figure", "bytes": 285204, "sha256": "ce8df8fdf3e339a93351024ed58cc15e6a9dabfe11fa6935f9ceb8e82fd8a380"},
+    {"file": "results/per_amplitude_abs_error.png", "role": "evaluated-error figure", "bytes": 131836, "sha256": "f159f298f80dd5e26335b1ed0e90239ff5f126d87244e4c4e8c00e3b06ea3bf6"}
+  ]
+}

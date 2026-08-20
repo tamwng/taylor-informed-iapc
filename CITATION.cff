@@ -1,19 +1,18 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite both the paper and the software release."
+message: "If you use this software, please cite both the accompanying manuscript and the software."
 title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors: MATLAB Code"
 type: software
 authors:
   - family-names: "Nguyen"
     given-names: "Tam W."
-version: "1.0.0"
-date-released: "2026-07-08"
 license: "BSD-3-Clause"
 repository-code: "https://github.com/tamwng/taylor-informed-iapc"
 url: "https://github.com/tamwng/taylor-informed-iapc"
 abstract: >-
-  MATLAB implementation of Taylor-informed indirect adaptive predictive
-  control using recursive least squares, structured Taylor dictionaries,
-  Jacobian-frozen affine predictors, and model predictive control.
+  Reproducible MATLAB implementation of Taylor-informed indirect adaptive
+  predictive control using recursive least squares, a forward-Euler-informed
+  reduced polynomial dictionary, Jacobian-frozen affine predictors, and model
+  predictive control for an RK4-simulated nonlinear plant.
 keywords:
   - adaptive control
   - predictive control
@@ -22,11 +21,9 @@ keywords:
   - affine predictor
   - model predictive control
 preferred-citation:
-  type: article
-  title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen LPV--ARX Surrogates"
+  type: unpublished
+  title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors"
   authors:
     - family-names: "Nguyen"
       given-names: "Tam W."
   year: 2026
-  journal: "arXiv preprint arXiv:XXXX.XXXXX"
-  url: "https://arxiv.org/abs/XXXX.XXXXX"

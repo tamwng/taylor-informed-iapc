@@ -1,4 +1,9 @@
 function [summary,segments] = compute_metrics(result,p)
+%COMPUTE_METRICS Compute the documented canonical evaluation metrics.
+% Overall RMSE/MAE use k >= Nid, including the final state sample at K.
+% Segment metrics use each 300-sample half-open interval [start,stop).
+% For amplitude-swept sine segments, evaluated error discards one complete
+% sinusoidal period (200 samples for the canonical experiment).
 
 k = result.k;
 e = result.x - result.reference;
@@ -66,9 +71,11 @@ else
     totalVariation = 0;
 end
 
+% Violations are measured over all stored samples, including initialization.
 maxStateViolation = max([0; abs(result.x(:))-p.constraints.xMax]);
 maxInputViolation = max([0; abs(result.u(:))-p.constraints.uMax]);
 
+% Slack is the largest optimized soft-state-constraint relaxation.
 validSlack = result.qpMaxSlack(~isnan(result.qpMaxSlack));
 if isempty(validSlack)
     maxPredictedSlack = NaN;
@@ -76,6 +83,7 @@ else
     maxPredictedSlack = max(validSlack);
 end
 
+% One QP is solved for each control instant Nid,...,K-1.
 qpMask = k >= p.id.Nid & k < p.simulation.K;
 qpFlags = result.qpExitflag(qpMask);
 qpFailures = sum(qpFlags <= 0 | isnan(qpFlags));

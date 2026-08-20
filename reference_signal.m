@@ -1,7 +1,6 @@
 function r = reference_signal(k,p)
 inputSize = size(k);
 k = k(:);
-r = zeros(size(k));
 
 if ~isfield(p.reference,'type')
     p.reference.type = 'steps';

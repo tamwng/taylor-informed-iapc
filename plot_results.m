@@ -1,16 +1,10 @@
-function plot_results(results,p)
+function figures = plot_results(results,p)
+%PLOT_RESULTS Create deterministic, publication-quality result figures.
 
-set(groot,...
-    'defaultAxesTickLabelInterpreter','latex',...
-    'defaultTextInterpreter','latex',...
-    'defaultLegendInterpreter','latex',...
-    'defaultAxesFontSize',14,...
-    'defaultTextFontSize',14,...
-    'defaultLegendFontSize',13,...
-    'defaultAxesLabelFontSizeMultiplier',1.2,...
-    'defaultAxesTitleFontSizeMultiplier',1.0,...
-    'defaultAxesLineWidth',1.0,...
-    'defaultLineLineWidth',1.5);
+% Windows accessibility text scaling can force Scrollable='on' even for
+% fixed-size invisible figures. It does not affect exported axes content.
+warningState = warning('off','MATLAB:uicontainer:ScrollableOnWithTextScaling');
+warningCleanup = onCleanup(@() warning(warningState));
 
 labels = cellfun(@(s) sprintf('$D = %d$',s.D),results, ...
     'UniformOutput',false);
@@ -20,137 +14,125 @@ if p.output.save && ~exist(p.output.folder,'dir')
     mkdir(p.output.folder);
 end
 
-plot_state_tracking_main(results,p,activationTime);
-% plot_control_input(results,p,labels,activationTime);
-plot_tracking_error_log(results,p,labels,activationTime);
-plot_segment_error_bars(results,p);
-% plot_jacobian_comparison(results,p);
+figures.stateTracking = plot_state_tracking(results,p,activationTime);
+figures.trackingError = plot_tracking_error(results,p,labels,activationTime);
+figures.segmentError = plot_segment_error_bars(results,p);
 
+if p.plot.showControlInput
+    figures.controlInput = plot_control_input(results,p,labels,activationTime);
+end
+
+if p.plot.showJacobianComparison
+    figures.jacobianComparison = plot_jacobian_comparison(results,p);
+end
 end
 
 
-function plot_state_tracking_main(results,p,activationTime)
+function fig = plot_state_tracking(results,p,activationTime)
 
 mainDegrees = [1 5];
-figure('Name','State tracking main comparison','Color','w');
-hold on;
+fig = new_figure('State tracking main comparison',p);
+ax = axes(fig);
+hold(ax,'on');
 
-ax = gca;
-plot(results{1}.time,results{1}.reference,'k--','LineWidth',1.9,...
+plot(ax,results{1}.time,results{1}.reference,'k--','LineWidth',1.9, ...
     'DisplayName','Reference');
-
-ax.ColorOrderIndex = 1;
 
 for d = mainDegrees
     idx = find(cellfun(@(s) s.D == d,results),1);
-
     if isempty(idx)
         continue;
     end
 
-    switch d
-        case 1
-            width = 1.6;
-        case 5
-            width = 0.9;
+    width = 1.1;
+    if d == 1
+        width = 1.6;
+    elseif d == 5
+        width = 1.0;
     end
 
-    plot(results{idx}.time,results{idx}.x,...
-        'LineStyle','-',...
-        'LineWidth',width,...
+    plot(ax,results{idx}.time,results{idx}.x,'LineWidth',width, ...
         'DisplayName',sprintf('$D = %d$',d));
 end
 
-yline(p.constraints.xMax,':','HandleVisibility','off');
-yline(-p.constraints.xMax,':','HandleVisibility','off');
-xline(activationTime,':','MPC on','HandleVisibility','off');
-
-xlabel('$t$ (s)', 'Interpreter', 'latex');
-ylabel('$x$', 'Interpreter', 'latex');
-grid on;
-legend('Location','northeast');
-
-if p.output.save
-    saveas(gcf,fullfile(p.output.folder,'state_tracking_D1_D5.png'));
-end
-
+yline(ax,p.constraints.xMax,':','HandleVisibility','off');
+yline(ax,-p.constraints.xMax,':','HandleVisibility','off');
+xline(ax,activationTime,':','MPC on','HandleVisibility','off', ...
+    'LabelOrientation','horizontal');
+xlabel(ax,'$t$ (s)');
+ylabel(ax,'$x$');
+grid(ax,'on');
+legend(ax,'Location','northeast');
+configure_axes(ax);
+save_figure(fig,p,'state_tracking_D1_D5.png');
 end
 
 
-function plot_control_input(results,p,labels,activationTime)
+function fig = plot_control_input(results,p,labels,activationTime)
 
-figure('Name','Control input','Color','w');
-hold on;
+fig = new_figure('Control input',p);
+ax = axes(fig);
+hold(ax,'on');
 
 for i = 1:numel(results)
-    stairs(results{i}.time,results{i}.u,'LineWidth',1.1, ...
+    stairs(ax,results{i}.time,results{i}.u,'LineWidth',1.1, ...
         'DisplayName',labels{i});
 end
 
-yline(p.constraints.uMax,':','HandleVisibility','off');
-yline(-p.constraints.uMax,':','HandleVisibility','off');
-xline(activationTime,':','MPC on','HandleVisibility','off');
-
-xlabel('Time (s)');
-ylabel('Input u');
-grid on;
-legend('Location','best');
-
-if p.output.save
-    saveas(gcf,fullfile(p.output.folder,'control_input.png'));
-end
-
+yline(ax,p.constraints.uMax,':','HandleVisibility','off');
+yline(ax,-p.constraints.uMax,':','HandleVisibility','off');
+xline(ax,activationTime,':','MPC on','HandleVisibility','off', ...
+    'LabelOrientation','horizontal');
+xlabel(ax,'$t$ (s)');
+ylabel(ax,'$u$');
+grid(ax,'on');
+legend(ax,'Location','best');
+configure_axes(ax);
+save_figure(fig,p,'control_input.png');
 end
 
 
-function plot_tracking_error_log(results,p,labels,activationTime)
+function fig = plot_tracking_error(results,p,labels,activationTime)
 
-p.plot.errorDegrees = [1 5];
-
-if isfield(p.plot,'errorDegrees')
-    degreesToPlot = p.plot.errorDegrees;
-else
-    degreesToPlot = cellfun(@(s) s.D,results);
-end
-
-figure('Name','Absolute tracking error','Color','w');
-hold on;
+fig = new_figure('Absolute tracking error',p);
+ax = axes(fig);
+ax.YScale = 'log';
+hold(ax,'on');
 
 for i = 1:numel(results)
-    if ~ismember(results{i}.D,degreesToPlot)
+    if ~ismember(results{i}.D,p.plot.errorDegrees)
         continue;
     end
 
     errorMagnitude = abs(results{i}.reference - results{i}.x);
-
-    switch results{i}.D
-        case 1
-            width = 1.6;
-        case 5
-            width = 0.9;
+    width = 1.1;
+    if results{i}.D == 1
+        width = 1.6;
+    elseif results{i}.D == 5
+        width = 1.0;
     end
 
-    semilogy(results{i}.time,errorMagnitude + 1e-8, ...
+    plot(ax,results{i}.time,errorMagnitude + 1e-8, ...
         'LineWidth',width,'DisplayName',labels{i});
 end
 
-xline(activationTime,':','MPC on','HandleVisibility','off');
-
-xlabel('$t$ (s)', 'Interpreter', 'latex');
-ylabel('$|r-x|$', 'Interpreter', 'latex');
-grid on;
-legend('Location','northeast');
-
-if p.output.save
-    saveas(gcf,fullfile(p.output.folder,'tracking_error_log.png'));
+xline(ax,activationTime,':','MPC on','HandleVisibility','off', ...
+    'LabelOrientation','horizontal');
+xlabel(ax,'$t$ (s)');
+ylabel(ax,'$|r-x|$');
+ylim(ax,[1e-8 1]);
+grid(ax,'on');
+legend(ax,'Location','northeast');
+configure_axes(ax);
+assert(strcmp(ax.YScale,'log'),'Tracking-error axes must be logarithmic.');
+save_figure(fig,p,'tracking_error_log.png');
 end
 
-end
 
-
-function plot_segment_error_bars(results,p)
+function fig = plot_segment_error_bars(results,p)
 
 if ~(isfield(p.reference,'type') && strcmpi(p.reference.type,'amp_sine'))
+    fig = gobjects(0);
     return;
 end
 
@@ -161,88 +143,94 @@ errorTable = NaN(numel(ampLevels),numel(degrees));
 for i = 1:numel(results)
     current = results{i};
     k = current.k;
-    e = current.x - current.reference;
+    error = current.x - current.reference;
 
     for j = 1:numel(ampLevels)
         segmentStart = p.id.Nid + (j-1)*p.reference.Kr;
         segmentStop = segmentStart + p.reference.Kr;
-
-        skip = round(1/(p.reference.frequencyHz*p.plant.Ts));
-        evalStart = min(segmentStart + skip,segmentStop-1);
-
-        mask = k >= evalStart & k < segmentStop;
-        errorTable(j,i) = mean(abs(e(mask)));
+        periodSamples = round(1/(p.reference.frequencyHz*p.plant.Ts));
+        evaluationStart = min(segmentStart + periodSamples,segmentStop-1);
+        mask = k >= evaluationStart & k < segmentStop;
+        errorTable(j,i) = mean(abs(error(mask)));
     end
 end
 
-figure('Name','Per-amplitude evaluated error','Color','w');
-bar(ampLevels,errorTable);
-
-xlabel('Sine amplitude', 'Interpreter', 'latex');
-ylabel('Evaluated mean absolute error', 'Interpreter', 'latex');
-grid on;
-legend(arrayfun(@(d) sprintf('$D = %d$',d),degrees, ...
+fig = new_figure('Per-amplitude evaluated error',p);
+ax = axes(fig);
+bar(ax,ampLevels,errorTable);
+xlabel(ax,'Sine amplitude');
+ylabel(ax,'Evaluated mean absolute error');
+grid(ax,'on');
+legend(ax,arrayfun(@(d) sprintf('$D = %d$',d),degrees, ...
     'UniformOutput',false),'Location','best');
-
-if p.output.save
-    saveas(gcf,fullfile(p.output.folder,'per_amplitude_abs_error.png'));
-end
-
-% idx1 = find(degrees == 1,1);
-% idx5 = find(degrees == 5,1);
-% 
-% if ~isempty(idx1) && ~isempty(idx5)
-%     improvement = errorTable(:,idx1)./errorTable(:,idx5);
-% 
-%     figure('Name','D1 over D5 error ratio','Color','w');
-%     bar(ampLevels,improvement);
-% 
-%     yline(1,':','HandleVisibility','off');
-%     xlabel('Sine amplitude', 'Interpreter', 'latex');
-%     ylabel('$|e|_{D=1} / |e|_{D=5}$', 'Interpreter', 'latex');
-%     grid on;
-% 
-%     if p.output.save
-%         saveas(gcf,fullfile(p.output.folder,'D1_over_D5_error_ratio.png'));
-%     end
-% end
-
+configure_axes(ax);
+save_figure(fig,p,'per_amplitude_abs_error.png');
 end
 
 
-function plot_jacobian_comparison(results,p)
+function fig = plot_jacobian_comparison(results,p)
 
 selected = find(cellfun(@(s) s.D == p.plot.jacobianDegree,results),1);
-
 if isempty(selected)
+    fig = gobjects(0);
     return;
 end
 
 current = results{selected};
 mask = current.k >= p.id.Nid;
+fig = new_figure('Optional forward-Euler Jacobian diagnostic',p);
 
-figure('Name','Jacobian comparison','Color','w');
+ax1 = subplot(2,1,1,'Parent',fig);
+plot(ax1,current.time(mask),current.Ahat(mask),'LineWidth',1.1);
+hold(ax1,'on');
+plot(ax1,current.time(mask),current.Afe(mask),'k--','LineWidth',1.1);
+ylabel(ax1,'$A$');
+grid(ax1,'on');
+legend(ax1,'Identified','Analytical FE','Location','best');
+title(ax1,sprintf('Optional FE diagnostic, $D = %d$',current.D));
+configure_axes(ax1);
 
-subplot(2,1,1);
-plot(current.time(mask),current.Ahat(mask),'LineWidth',1.1);
-hold on;
-plot(current.time(mask),current.Afe(mask),'k--','LineWidth',1.1);
-ylabel('A');
-grid on;
-legend('Identified','Analytical FE','Location','best');
-title(sprintf('Jacobian comparison, D = %d',current.D));
-
-subplot(2,1,2);
-plot(current.time(mask),current.Bhat(mask),'LineWidth',1.1);
-hold on;
-plot(current.time(mask),current.Bfe(mask),'k--','LineWidth',1.1);
-xlabel('Time (s)');
-ylabel('B');
-grid on;
-legend('Identified','Analytical FE','Location','best');
-
-if p.output.save
-    saveas(gcf,fullfile(p.output.folder,'jacobian_comparison.png'));
+ax2 = subplot(2,1,2,'Parent',fig);
+plot(ax2,current.time(mask),current.Bhat(mask),'LineWidth',1.1);
+hold(ax2,'on');
+plot(ax2,current.time(mask),current.Bfe(mask),'k--','LineWidth',1.1);
+xlabel(ax2,'$t$ (s)');
+ylabel(ax2,'$B$');
+grid(ax2,'on');
+legend(ax2,'Identified','Analytical FE','Location','best');
+configure_axes(ax2);
+save_figure(fig,p,'jacobian_comparison.png');
 end
 
+
+function fig = new_figure(name,p)
+
+fig = figure('Name',name,'Color','w', ...
+    'Visible',p.output.figureVisible, ...
+    'Position',p.plot.figurePosition, ...
+    'Scrollable','off', ...
+    'Renderer',p.plot.renderer);
+end
+
+
+function configure_axes(ax)
+
+set(ax,'TickLabelInterpreter','latex','FontSize',14,'LineWidth',1.0);
+ax.XLabel.Interpreter = 'latex';
+ax.YLabel.Interpreter = 'latex';
+ax.Title.Interpreter = 'latex';
+if ~isempty(ax.Legend)
+    ax.Legend.Interpreter = 'latex';
+    ax.Legend.FontSize = 13;
+end
+end
+
+
+function save_figure(fig,p,filename)
+
+if p.output.save && isgraphics(fig)
+    drawnow;
+    exportgraphics(fig,fullfile(p.output.folder,filename), ...
+        'Resolution',p.plot.resolution,'BackgroundColor','white');
+end
 end
