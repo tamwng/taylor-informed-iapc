@@ -8,7 +8,7 @@ Please cite both the accompanying manuscript and the software when this reposito
 @unpublished{nguyen2026taylorinformedadaptivepredictivecontrol,
   author = {Nguyen, Tam W.},
   title  = {Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors},
-  note   = {Manuscript prepared for the 2027 American Control Conference},
+  note   = {Manuscript prepared for an IEEE Control Systems Letters and 2027 American Control Conference joint submission},
   year   = {2026}
 }
 ```
