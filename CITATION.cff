@@ -3,7 +3,6 @@ message: "If you use this software, please cite both the accompanying manuscript
 title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors: MATLAB Code"
 type: software
 version: "1.0.0"
-date-released: "2026-08-20"
 authors:
   - family-names: "Nguyen"
     given-names: "Tam W."
@@ -23,9 +22,14 @@ keywords:
   - affine predictor
   - model predictive control
 preferred-citation:
-  type: unpublished
+  type: article
   title: "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors"
   authors:
     - family-names: "Nguyen"
       given-names: "Tam W."
   year: 2026
+  identifiers:
+    - type: other
+      value: "arXiv:2609.03348"
+      description: "arXiv identifier"
+  url: "https://arxiv.org/abs/2609.03348"

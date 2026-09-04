@@ -54,13 +54,13 @@ All cases have zero QP failures and zero input-bound violations.
 
 ## Exact citation text
 
-Manuscript: Tam W. Nguyen, “Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors,” manuscript prepared for an IEEE Control Systems Letters and 2027 American Control Conference joint submission, 2026.
+Manuscript: Tam W. Nguyen, “Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors,” arXiv:2609.03348 [eess.SY], 2026, https://arxiv.org/abs/2609.03348.
 
-Software: Tam W. Nguyen, *Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors: MATLAB Code*, version 1.0.0, GitHub, 2026, https://github.com/tamwng/taylor-informed-iapc/releases/tag/v1.0.0.
+Software: Tam W. Nguyen, *Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors: MATLAB Code*, version 1.0.0, GitHub, 2026, https://github.com/tamwng/taylor-informed-iapc/tree/v1.0.0.
 
-## External identifiers and release
+## External identifiers and version
 
 - Manuscript DOI: not assigned.
-- Manuscript arXiv identifier: not assigned.
-- Immutable software release/tag: `v1.0.0`.
-- Release commit: `895e99be7794a5084bbf02c9ed7c9fd8d82a9711`.
+- Manuscript arXiv identifier: `2609.03348` (version 1).
+- Manuscript arXiv URL: https://arxiv.org/abs/2609.03348.
+- Stable software version/tag: `v1.0.0`.

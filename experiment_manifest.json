@@ -2,11 +2,18 @@
   "schema_version": "1.0",
   "generated_at_utc": "2026-08-20T08:56:50Z",
   "title": "Taylor-Informed Indirect Adaptive Predictive Control Using Jacobian-Frozen Affine Predictors",
+  "manuscript": {
+    "arxiv_id": "2609.03348",
+    "arxiv_version": "v1",
+    "arxiv_url": "https://arxiv.org/abs/2609.03348",
+    "submitted_at_utc": "2026-09-03T04:10:52Z",
+    "primary_category": "eess.SY"
+  },
   "source_state": {
     "base_commit": "6dbaa2b66c7a1f85877f4432b3710ff79c3db5b4",
-    "release_tag": "v1.0.0",
-    "release_commit": "895e99be7794a5084bbf02c9ed7c9fd8d82a9711",
-    "status": "Canonical artifacts correspond to immutable release v1.0.0; subsequent documentation-only commits do not alter the experiment."
+    "version": "1.0.0",
+    "version_tag": "v1.0.0",
+    "status": "Canonical artifacts correspond to stable version v1.0.0."
   },
   "environment": {
     "baseline_matlab_release": "R2025b",
